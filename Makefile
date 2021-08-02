@@ -8,10 +8,10 @@ CFLAGS = -Wall -lncurses -I$(IDIR)
 CDIR = src
 ODIR = src
 
-_DEPS = agent.h peragent.h peragent_list.h agent_actions.h
+_DEPS = agent.h peragent.h peragent_list.h agent_actions.h map.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 # _OBJ = agent.o peragent.o main.o
-_OBJ = main.o agent_actions.o
+_OBJ = main.o agent_actions.o map.c
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 EXEC = iron-tiger
