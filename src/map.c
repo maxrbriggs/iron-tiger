@@ -21,6 +21,8 @@ struct MAP *init_map_blank()
 		new_map->tiles[0][i]->flooded = 0;
 		new_map->tiles[0][i]->deep = 0;
 		new_map->tiles[0][i]->blocked = 1;
+		new_map->tiles[0][i]->seen = 0;
+		new_map->tiles[0][i]->visited = 0;
 		new_map->tiles[0][i]->mlet = '#';
 
 		new_map->tiles[MAPSIZE - 1][i] = (struct MAP_TILE *) malloc(sizeof(struct MAP_TILE));
@@ -37,6 +39,8 @@ struct MAP *init_map_blank()
 		new_map->tiles[i][0]->flooded = 0;
 		new_map->tiles[i][0]->deep = 0;
 		new_map->tiles[i][0]->blocked = 1;
+		new_map->tiles[i][0]->seen = 0;
+		new_map->tiles[i][0]->visited = 0;
 		new_map->tiles[i][0]->mlet = '#';
 
 		new_map->tiles[i][MAPSIZE - 1] = (struct MAP_TILE *) malloc(sizeof(struct MAP_TILE));
@@ -44,6 +48,8 @@ struct MAP *init_map_blank()
 		new_map->tiles[i][MAPSIZE - 1]->flooded = 0;
 		new_map->tiles[i][MAPSIZE - 1]->deep = 0;
 		new_map->tiles[i][MAPSIZE - 1]->blocked = 1;
+		new_map->tiles[i][MAPSIZE - 1]->seen = 0;
+		new_map->tiles[i][MAPSIZE - 1]->visited = 0;
 		new_map->tiles[i][MAPSIZE - 1]->mlet = '#';
 	}
 
@@ -54,6 +60,8 @@ struct MAP *init_map_blank()
 		new_map->tiles[i][j]->flooded = 0;
 		new_map->tiles[i][j]->deep = 0;
 		new_map->tiles[i][j]->blocked = 0;
+		new_map->tiles[i][j]->seen = 0;
+		new_map->tiles[i][j]->visited = 0;
 		new_map->tiles[i][j]->mlet = ' ';
 		}
 	}
