@@ -3,11 +3,14 @@
 #include "peragent_list.h"
 #include "agent.h"
 #include "agent_actions.h"
+#include "map.h"
 
 void move_pc(int, struct agent *);
+WINDOW *init_main_win();
 
 int main()
 {
+	WINDOW *main_win;
 	int ch;
 
 	extern struct peragent agentlist[]; /* probably not a good idea */
@@ -15,8 +18,8 @@ int main()
 
 	player.data = &agentlist[0];
 
-	player.ay = 0;
-	player.ax = 0;
+	player.ay = 1;
+	player.ax = 1;
 
 	/* ncurses init */
 	initscr();
@@ -24,15 +27,19 @@ int main()
 	keypad(stdscr, TRUE);
 	curs_set(0);
 	noecho();
+	refresh();
 
-	clear();
-	mvprintw(player.ay, player.ax, "%c", player.data->alet);
+	main_win = init_main_win();
+
+
+	mvwprintw(main_win, player.ay, player.ax, "%c", player.data->alet);
+	wrefresh(main_win);
 
 	while ((ch = getch()) != KEY_F(1)) {
-		clear();
+		wclear(main_win);
 		move_pc(ch, &player);
-		mvprintw(player.ay, player.ax, "%c", player.data->alet);
-		refresh();
+		mvwprintw(main_win, player.ay, player.ax, "%c", player.data->alet);
+		wrefresh(main_win);
 	}
 	endwin();
 
@@ -67,4 +74,17 @@ void move_pc(int ch, struct agent *pc)
 		agent_move(pc, 1, 0);
 		break;
 	}
+}
+
+WINDOW *init_main_win()
+{
+	int scry, scrx;
+	WINDOW *new_win;
+
+	getmaxyx(stdscr, scry, scrx);
+
+	new_win = newwin(scry - 16, scrx - 16, 0, 0);
+	wrefresh(new_win);
+
+	return new_win;
 }
