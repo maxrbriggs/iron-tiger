@@ -1,20 +1,20 @@
 #include <ncurses.h>
+#include "peragent.h"
+#include "peragent_list.h"
+#include "agent.h"
 
-typedef struct _entity_struct {
-	int y, x;
-	char look;
-} ENTITY;
-
-void move_pc(int, ENTITY*);
+void move_pc(int, struct agent *);
 
 int main()
 {
 	int ch;
-	ENTITY player;
+	struct agent player;
+	extern struct peragent agentlist[]; /* probably not a good idea */
 
-	player.y = 0;
-	player.x = 0;
-	player.look = '@';
+	player.data = &agentlist[0];
+
+	player.ay = 0;
+	player.ax = 0;
 
 	initscr();
 	cbreak();
@@ -23,12 +23,12 @@ int main()
 	noecho();
 
 	clear();
-	mvprintw(player.y, player.x, "%c", player.look);
+	mvprintw(player.ay, player.ax, "%c", player.data->alet);
 
 	while ((ch = getch()) != KEY_F(1)) {
 		clear();
 		move_pc(ch, &player);
-		mvprintw(player.y, player.x, "%c", player.look);
+		mvprintw(player.ay, player.ax, "%c", player.data->alet);
 		refresh();
 	}
 	endwin();
@@ -36,7 +36,7 @@ int main()
 	return 0;
 }
 
-void move_pc(int ch, ENTITY *pc)
+void move_pc(int ch, struct agent *pc)
 {
 	int max_y, max_x;
 
@@ -44,20 +44,36 @@ void move_pc(int ch, ENTITY *pc)
 
 	switch(ch) {
 	case KEY_LEFT:
-		if (pc->x > 0)
-			pc->x--;
+		if (pc->ax > 0)
+			pc->ax--;
+		break;
+	case 'h':
+		if (pc->ax > 0)
+			pc->ax--;
 		break;
 	case KEY_RIGHT:
-		if (pc->x < max_x)
-			pc->x++;
+		if (pc->ax < max_x)
+			pc->ax++;
+		break;
+	case 'l':
+		if (pc->ax < max_x)
+			pc->ax++;
 		break;
 	case KEY_UP:
-		if (pc->y > 0)
-			pc->y--;
+		if (pc->ay > 0)
+			pc->ay--;
+		break;
+	case 'k':
+		if (pc->ay > 0)
+			pc->ay--;
 		break;
 	case KEY_DOWN:
-		if (pc->y < max_y)
-			pc->y++;
+		if (pc->ay < max_y)
+			pc->ay++;
+		break;
+	case 'j':
+		if (pc->ay < max_y)
+			pc->ay++;
 		break;
 	}
 }
