@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <ncurses.h>
 #include "map.h"
 #include "peragent.h"
@@ -47,6 +48,15 @@ int main()
 	}
 	endwin();
 
+	for (int i = 0; i < MAPSIZE; i++){
+		for (int j = 0; j < MAPSIZE; j++) {
+			free(main_map->tiles[i][j]);
+		}
+	}
+
+	free(main_map);
+
+
 	return 0;
 }
 
@@ -76,6 +86,18 @@ void move_pc(int ch, struct agent *pc, struct MAP *map)
 		break;
 	case 'j':
 		agent_move(pc, map, 1, 0);
+		break;
+	case 'y':
+		agent_move(pc, map, -1, -1);
+		break;
+	case 'u':
+		agent_move(pc, map, -1, 1);
+		break;
+	case 'n':
+		agent_move(pc, map, 1, 1);
+		break;
+	case 'b':
+		agent_move(pc, map, 1, -1);
 		break;
 	}
 }
