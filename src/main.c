@@ -2,20 +2,23 @@
 #include "peragent.h"
 #include "peragent_list.h"
 #include "agent.h"
+#include "agent_actions.h"
 
 void move_pc(int, struct agent *);
 
 int main()
 {
 	int ch;
-	struct agent player;
+
 	extern struct peragent agentlist[]; /* probably not a good idea */
+	struct agent player;
 
 	player.data = &agentlist[0];
 
 	player.ay = 0;
 	player.ax = 0;
 
+	/* ncurses init */
 	initscr();
 	cbreak();
 	keypad(stdscr, TRUE);
@@ -38,42 +41,30 @@ int main()
 
 void move_pc(int ch, struct agent *pc)
 {
-	int max_y, max_x;
-
-	getmaxyx(stdscr, max_y, max_x);
-
 	switch(ch) {
 	case KEY_LEFT:
-		if (pc->ax > 0)
-			pc->ax--;
+		agent_move(pc, 0, -1);
 		break;
 	case 'h':
-		if (pc->ax > 0)
-			pc->ax--;
+		agent_move(pc, 0, -1);
 		break;
 	case KEY_RIGHT:
-		if (pc->ax < max_x)
-			pc->ax++;
+		agent_move(pc, 0, 1);
 		break;
 	case 'l':
-		if (pc->ax < max_x)
-			pc->ax++;
+		agent_move(pc, 0, 1);
 		break;
 	case KEY_UP:
-		if (pc->ay > 0)
-			pc->ay--;
+		agent_move(pc, -1, 0);
 		break;
 	case 'k':
-		if (pc->ay > 0)
-			pc->ay--;
+		agent_move(pc, -1, 0);
 		break;
 	case KEY_DOWN:
-		if (pc->ay < max_y)
-			pc->ay++;
+		agent_move(pc, 1, 0);
 		break;
 	case 'j':
-		if (pc->ay < max_y)
-			pc->ay++;
+		agent_move(pc, 1, 0);
 		break;
 	}
 }
