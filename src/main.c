@@ -6,24 +6,29 @@
 #include "agent.h"
 #include "agent_actions.h"
 
-void move_pc(int, struct agent *, struct MAP *);
+#ifndef MAPSIZE
+#define MAPSIZE 256
+#endif
+
+void read_keys(int, struct AGENT *, struct MAP *);
 WINDOW *init_main_win();
 void fill_map(struct MAP *, WINDOW *);
 
 int main()
 {
 	WINDOW *main_win;
-	int ch;
+	int key;
 
 	struct MAP *main_map = init_map_blank();
 
-	extern struct peragent agentlist[]; /* probably not a good idea */
-	struct agent player;
+	extern struct PERAGENT AGENTLIST[]; /* probably not a good idea */
+	struct AGENT player;
 
-	player.data = &agentlist[0];
+	player.data = &AGENTLIST[0];
 
-	player.ay = 1;
-	player.ax = 1;
+	/* put player in middle of map */
+	player.ay = MAPSIZE / 2 - 1;
+	player.ax = MAPSIZE / 2 - 1;
 
 	/* ncurses init */
 	initscr();
@@ -40,9 +45,9 @@ int main()
 	mvwprintw(main_win, player.ay, player.ax, "%c", player.data->alet);
 	wrefresh(main_win);
 
-	while ((ch = getch()) != KEY_F(1)) {
+	while ((key = getch()) != KEY_F(1)) {
 		mvwprintw(main_win, player.ay, player.ax, "%c", main_map->tiles[player.ay][player.ax]->mlet); /* replace pc char with tile under */
-		move_pc(ch, &player, main_map);
+		read_keys(key, &player, main_map);
 		mvwprintw(main_win, player.ay, player.ax, "%c", player.data->alet);
 		wrefresh(main_win);
 	}
@@ -60,9 +65,10 @@ int main()
 	return 0;
 }
 
-void move_pc(int ch, struct agent *pc, struct MAP *map)
+void read_keys(int keys, struct AGENT *pc, struct MAP *map)
 {
-	switch(ch) {
+	switch(keys) {
+	/* momement */
 	case KEY_LEFT:
 		agent_move(pc, map, 0, -1);
 		break;

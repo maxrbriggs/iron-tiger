@@ -1,2 +1,2 @@
-int agent_move(struct agent *, struct MAP *, int, int);
-int collision_detect(struct agent *, int, int);
+int agent_move(struct AGENT *, struct MAP *, int, int);
+int collision_detect(struct AGENT *, int, int);

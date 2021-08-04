@@ -1,5 +1,5 @@
 /* Definition of an instance of an agent */
-struct agent {
-	struct peragent *data;
+struct AGENT {
+	struct PERAGENT *data;
 	int ay, ax;
 };

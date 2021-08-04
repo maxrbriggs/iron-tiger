@@ -6,7 +6,7 @@
 /* Move an agent by dy spaces vertically and dx spaces horizontally
    Return 1 if successful, 0 if not
 */
-int agent_move(struct agent *tomove, struct MAP *map, int dy, int dx)
+int agent_move(struct AGENT *tomove, struct MAP *map, int dy, int dx)
 {
 	/* Eventually we want some collision checking whether agent can move.
 	   Maybe also consider moving agent as far as it can before colliding.
