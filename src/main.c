@@ -4,13 +4,14 @@
 #include "peragent.h"
 #include "peragent_list.h"
 #include "agent.h"
+#include "actions.h"
 #include "agent_actions.h"
 
 #ifndef MAPSIZE
 #define MAPSIZE 256
 #endif
 
-void read_keys(int, struct AGENT *, struct MAP *);
+struct ACTION_QUEUE_ENTRY *read_keys(int, struct AGENT *, struct MAP *);
 WINDOW *init_main_win();
 void fill_map(struct MAP *, WINDOW *);
 
@@ -20,15 +21,31 @@ int main()
 	int key;
 
 	struct MAP *main_map = init_map_blank();
+	struct ACTION_QUEUE *action_queue;
+	struct ACTION_QUEUE_ENTRY *action;
 
-	extern struct PERAGENT AGENTLIST[]; /* probably not a good idea */
-	struct AGENT player;
+	struct AGENT_LIST *agent_list;
+	extern const struct PERAGENT PERAGENTLIST[]; /* probably not a good idea */
 
-	player.data = &AGENTLIST[0];
+	struct AGENT **player;
+
+	/* initialize action queue */
+	action_queue = malloc(sizeof(struct ACTION_QUEUE));
+	action_queue->head = NULL;
+	action_queue->tail = NULL;
+
+	/* initialize agent_list */
+	agent_list = malloc(sizeof(struct AGENT_LIST));
+	agent_list->head = NULL;
+	agent_list->tail = NULL;
+
+	add_agent(agent_list, malloc(sizeof(struct AGENT)), &PERAGENTLIST[0]);
+
+	player = &agent_list->head->agent;
 
 	/* put player in middle of map */
-	player.ay = MAPSIZE / 2 - 1;
-	player.ax = MAPSIZE / 2 - 1;
+	(*player)->y = MAPSIZE / 2 - 1;
+	(*player)->x = MAPSIZE / 2 - 1;
 
 	/* ncurses init */
 	initscr();
@@ -42,13 +59,22 @@ int main()
 	main_win = init_main_win();
 	fill_map(main_map, main_win);
 
-	mvwprintw(main_win, player.ay, player.ax, "%c", player.data->alet);
+	mvwprintw(main_win, (*player)->y, (*player)->x, "%c",
+			(*player)->data->alet);
 	wrefresh(main_win);
 
 	while ((key = getch()) != KEY_F(1)) {
-		mvwprintw(main_win, player.ay, player.ax, "%c", main_map->tiles[player.ay][player.ax]->mlet); /* replace pc char with tile under */
-		read_keys(key, &player, main_map);
-		mvwprintw(main_win, player.ay, player.ax, "%c", player.data->alet);
+		/* replace pc char with tile under */
+		mvwprintw(main_win, (*player)->y, (*player)->x,
+				"%c",
+				main_map->tiles[(*player)->y][(*player)->x]->mlet);
+		action = read_keys(key, (*player), main_map);
+		enqueue_action(action, action_queue);
+		resolve_actions(action_queue);
+		update_agents(agent_list, action_queue);
+		clear_action_queue(action_queue);
+		mvwprintw(main_win, (*player)->y, (*player)->x,
+				"%c", (*player)->data->alet);
 		wrefresh(main_win);
 	}
 	endwin();
@@ -61,51 +87,46 @@ int main()
 
 	free(main_map);
 
-
 	return 0;
 }
 
-void read_keys(int keys, struct AGENT *pc, struct MAP *map)
+struct ACTION_QUEUE_ENTRY *read_keys(int keys, struct AGENT *pc, struct MAP *map)
 {
+	struct ACTION_QUEUE_ENTRY *new_entry;
+
 	switch(keys) {
 	/* momement */
 	case KEY_LEFT:
-		agent_move(pc, map, 0, -1);
-		break;
 	case 'h':
-		agent_move(pc, map, 0, -1);
+		new_entry = agent_move(pc, map, 0, -1);
 		break;
 	case KEY_RIGHT:
-		agent_move(pc, map, 0, 1);
-		break;
 	case 'l':
-		agent_move(pc, map, 0, 1);
+		new_entry = agent_move(pc, map, 0, 1);
 		break;
 	case KEY_UP:
-		agent_move(pc, map, -1, 0);
-		break;
 	case 'k':
-		agent_move(pc, map, -1, 0);
+		new_entry = agent_move(pc, map, -1, 0);
 		break;
 	case KEY_DOWN:
-		agent_move(pc, map, 1, 0);
-		break;
 	case 'j':
-		agent_move(pc, map, 1, 0);
+		new_entry = agent_move(pc, map, 1, 0);
 		break;
 	case 'y':
-		agent_move(pc, map, -1, -1);
+		new_entry = agent_move(pc, map, -1, -1);
 		break;
 	case 'u':
-		agent_move(pc, map, -1, 1);
+		new_entry = agent_move(pc, map, -1, 1);
 		break;
 	case 'n':
-		agent_move(pc, map, 1, 1);
+		new_entry = agent_move(pc, map, 1, 1);
 		break;
 	case 'b':
-		agent_move(pc, map, 1, -1);
+		new_entry = agent_move(pc, map, 1, -1);
 		break;
 	}
+
+	return new_entry;
 }
 
 WINDOW *init_main_win()

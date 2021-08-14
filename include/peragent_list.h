@@ -1,5 +1,5 @@
 /* the list of all the kinds of agents */
-struct PERAGENT AGENTLIST[] = {
+const struct PERAGENT PERAGENTLIST[] = {
 	{ "player", '@'},
 	{ "npc",'n'}
 };
