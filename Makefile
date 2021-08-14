@@ -16,13 +16,15 @@ OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 EXEC = iron-tiger
 
+DEBUG_FLAG =
+
 $(ODIR)/%.o: $(CDIR)/%.c $(DEPS)
-	$(CC) -c -o $@ $< $(CFLAGS)
+	$(CC) $(DEBUG_FLAG) -c -o $@ $< $(CFLAGS)
 
 $(EXEC): $(OBJ)
-	$(CC) -o $@ $^ $(CFLAGS)
+	$(CC) $(DEBUG_FLAG) -o $@ $^ $(CFLAGS)
 
-debug : CFLAGS = -g -Wall -lncurses -I$(IDIR)
+debug : DEBUG_FLAG = -g
 debug : $(OBJ)
 debug : $(EXEC)
 
