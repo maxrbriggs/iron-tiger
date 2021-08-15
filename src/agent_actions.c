@@ -23,26 +23,29 @@ struct ACTION_QUEUE_ENTRY *agent_move(struct AGENT *tomove, struct MAP *map,
 	struct ACTION_QUEUE_ENTRY *new_entry;
 	new_entry = malloc(sizeof(struct ACTION_QUEUE_ENTRY));
 
+	new_entry->next = NULL;
+
+	/* if oob */
 	if (tomove->y + dy < 0
 	   || tomove->x + dx < 0
 	   || tomove->y + dy > MAPSIZE
-	   || tomove->x + dx > MAPSIZE) { /* check if oob */
+	   || tomove->x + dx > MAPSIZE) {
 		blocked = 1;
+	/* if blocked tile */
 	} else if (map->tiles[tomove->y + dy][tomove->x]->blocked
-	          || map->tiles[tomove->y][tomove->x + dx]->blocked) { /* if blocked tile */
+	          || map->tiles[tomove->y][tomove->x + dx]->blocked) {
 		blocked = 1;
 	}
 
+	new_entry->new_state = malloc(sizeof(struct AGENT));
+	new_entry->new_state->id = tomove->id;
+	new_entry->new_state->data = tomove->data;
+	new_entry->new_state->y = tomove->y;
+	new_entry->new_state->x = tomove->x;
+
 	if (!blocked) {
-		new_entry->new_state = malloc(sizeof(struct AGENT));
-		new_entry->new_state->id = tomove->id;
-		new_entry->new_state->data = tomove->data;
-		new_entry->new_state->y = tomove->y;
-		new_entry->new_state->x = tomove->x;
 		new_entry->new_state->y += dy;
 		new_entry->new_state->x += dx;
-	} else {
-		new_entry->new_state = tomove;
 	}
 
 	return new_entry;
@@ -78,20 +81,26 @@ int remove_agent(struct AGENT_LIST *agent_list, int id)
 
 	while (!removed && entry) {
 		if (entry->agent->id == id && !prev) {
+			/* if found at head of agent_list */
 			if (entry->agent) {
 				free(entry->agent);
+				entry->agent = NULL;
 			}
 			agent_list->head = entry->next;
 			free(entry);
+			entry = NULL;
 			removed = 1;
 		} else if (entry->agent->id == id) {
 			if (entry->agent) {
 				free(entry->agent);
+				entry->agent = NULL;
 			}
 			prev->next = entry->next;
 			free(entry);
+			entry = NULL;
 			removed = 1;
 		} else {
+			/* traverse list */
 			prev = entry;
 			entry = entry->next;
 		}
@@ -107,13 +116,12 @@ int remove_agent(struct AGENT_LIST *agent_list, int id)
 int update_agents(struct AGENT_LIST *agent_list,
 		struct ACTION_QUEUE *action_queue)
 {
-	struct AGENT_LIST_ENTRY *agent_entry = agent_list->head;
+	struct AGENT_LIST_ENTRY *agent_entry = NULL;
 	struct ACTION_QUEUE_ENTRY *action_entry = action_queue->head;
 	int agent_updated;
 
 	while (action_entry) {
 		agent_entry = agent_list->head;
-
 		if (action_entry->updated) {
 			agent_updated = 0;
 			while (!agent_updated && agent_entry) {
@@ -133,4 +141,3 @@ int update_agents(struct AGENT_LIST *agent_list,
 
 	return 1;
 }
-
