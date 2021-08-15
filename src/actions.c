@@ -1,8 +1,6 @@
 #include <stdlib.h>
 #include "map.h"
-#include "agent.h"
 #include "actions.h"
-#include "agent_actions.h"
 
 int enqueue_action(struct ACTION_QUEUE_ENTRY *entry,
 		struct ACTION_QUEUE *action_queue)
@@ -42,6 +40,7 @@ int clear_action_queue(struct ACTION_QUEUE *action_queue)
 		prev = entry;
 		entry = entry->next;
 		free(prev);
+		prev = NULL;
 	}
 
 	action_queue->head = NULL;

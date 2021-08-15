@@ -4,7 +4,6 @@
 */
 
 struct ACTION_QUEUE_ENTRY {
-	/* is it really a good idea to completely duplicate agents? */
 	int updated;
 	struct AGENT *new_state;
 	struct ACTION_QUEUE_ENTRY *next;

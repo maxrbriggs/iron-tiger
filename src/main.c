@@ -82,10 +82,12 @@ int main()
 	for (int i = 0; i < MAPSIZE; i++){
 		for (int j = 0; j < MAPSIZE; j++) {
 			free(main_map->tiles[i][j]);
+			main_map->tiles[i][j] = NULL;
 		}
 	}
 
 	free(main_map);
+	main_map = NULL;
 
 	return 0;
 }
