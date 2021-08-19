@@ -20,7 +20,7 @@ int main()
 	WINDOW *main_win;
 	int key;
 
-	struct MAP *main_map = init_map_blank();
+	struct MAP *main_map = init_map_blank(16, 16);
 	struct ACTION_QUEUE *action_queue;
 	struct ACTION_QUEUE_ENTRY *action;
 
@@ -44,8 +44,8 @@ int main()
 	player = &agent_list->head->agent;
 
 	/* put player in middle of map */
-	(*player)->y = MAPSIZE / 2 - 1;
-	(*player)->x = MAPSIZE / 2 - 1;
+	(*player)->y = main_map->sizey / 2 - 1;
+	(*player)->x = main_map->sizex / 2 - 1;
 
 	/* ncurses init */
 	initscr();
@@ -146,8 +146,8 @@ WINDOW *init_main_win()
 
 void fill_map(struct MAP * map, WINDOW * win)
 {
-	for (int i = 0; i < MAPSIZE; i++) {
-		for (int j = 0; j < MAPSIZE; j++) {
+	for (int i = 0; i < map->sizey; i++) {
+		for (int j = 0; j < map->sizex; j++) {
 			mvwprintw(win, i, j, "%c", map->tiles[i][j]->mlet);
 		}
 	}

@@ -6,6 +6,10 @@
 #include "actions.h"
 #include "agent_actions.h"
 
+#ifndef MAPSIZE
+#define MAPSIZE 256
+#endif
+
 /* Move an agent by dy spaces vertically and dx spaces horizontally
    Return 1 if successful, 0 if not
 */
@@ -28,8 +32,8 @@ struct ACTION_QUEUE_ENTRY *agent_move(struct AGENT *tomove, struct MAP *map,
 	/* if oob */
 	if (tomove->y + dy < 0
 	   || tomove->x + dx < 0
-	   || tomove->y + dy > MAPSIZE
-	   || tomove->x + dx > MAPSIZE) {
+	   || tomove->y + dy > map->sizey
+	   || tomove->x + dx > map->sizex) {
 		blocked = 1;
 	/* if blocked tile */
 	} else if (map->tiles[tomove->y + dy][tomove->x]->blocked
