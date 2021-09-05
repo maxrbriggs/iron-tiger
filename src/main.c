@@ -69,13 +69,15 @@ int main()
 				"%c",
 				main_map->tiles[(*player)->y][(*player)->x]->mlet);
 		action = read_keys(key, (*player), main_map);
-		enqueue_action(action, action_queue);
-		resolve_actions(action_queue);
-		update_agents(agent_list, action_queue);
-		clear_action_queue(action_queue);
-		mvwprintw(main_win, (*player)->y, (*player)->x,
-				"%c", (*player)->data->alet);
-		wrefresh(main_win);
+		if (action) {
+			enqueue_action(action, action_queue);
+			resolve_actions(action_queue);
+			update_agents(agent_list, action_queue);
+			clear_action_queue(action_queue);
+			mvwprintw(main_win, (*player)->y, (*player)->x,
+					"%c", (*player)->data->alet);
+			wrefresh(main_win);
+		}
 	}
 	endwin();
 
