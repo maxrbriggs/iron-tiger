@@ -5,6 +5,11 @@
 int enqueue_action(struct ACTION_QUEUE_ENTRY *entry,
 		struct ACTION_QUEUE *action_queue)
 {
+	/* NULL entry means no action */
+	if (!entry) {
+		return 0;
+	}
+
 	entry->updated = 0;
 
 	if (!action_queue->head) {

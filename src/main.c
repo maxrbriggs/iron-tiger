@@ -94,7 +94,7 @@ int main()
 
 struct ACTION_QUEUE_ENTRY *read_keys(int keys, struct AGENT *pc, struct MAP *map)
 {
-	struct ACTION_QUEUE_ENTRY *new_entry;
+	struct ACTION_QUEUE_ENTRY *new_entry = NULL;
 
 	switch(keys) {
 	/* momement */
