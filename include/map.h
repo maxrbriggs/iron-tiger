@@ -13,7 +13,7 @@ struct MAP_TILE {
 struct MAP {
 	unsigned int x, y, z;      /* map is chunk of larger world */
 	unsigned int sizey, sizex;
-	struct MAP_TILE *tiles[MAPSIZE][MAPSIZE];
+	struct MAP_TILE ***tiles;
 };
 
 struct MAP *init_map_blank(unsigned int, unsigned int);
