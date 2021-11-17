@@ -14,6 +14,7 @@
 struct ACTION_QUEUE_ENTRY *read_keys(int, struct AGENT *, struct MAP *);
 WINDOW *init_main_win();
 void fill_map(struct MAP *, WINDOW *);
+struct ACTION_QUEUE_ENTRY *move_random(struct AGENT *, struct MAP *);
 
 int main()
 {
@@ -24,10 +25,12 @@ int main()
 	struct ACTION_QUEUE *action_queue;
 	struct ACTION_QUEUE_ENTRY *action;
 
+	struct AGENT_LIST_ENTRY *entry;
 	struct AGENT_LIST *agent_list;
 	extern const struct PERAGENT PERAGENTLIST[]; /* probably not a good idea */
 
 	struct AGENT **player;
+	struct AGENT **npc;
 
 	/* initialize action queue */
 	action_queue = malloc(sizeof(struct ACTION_QUEUE));
@@ -40,12 +43,19 @@ int main()
 	agent_list->tail = NULL;
 
 	add_agent(agent_list, malloc(sizeof(struct AGENT)), &PERAGENTLIST[0]);
+	add_agent(agent_list, malloc(sizeof(struct AGENT)), &PERAGENTLIST[1]);
 
 	player = &agent_list->head->agent;
+	npc = &agent_list->tail->agent; /* probably better to represent agent
+					   list as an array */
 
 	/* put player in middle of map */
 	(*player)->y = main_map->sizey / 2 - 1;
 	(*player)->x = main_map->sizex / 2 - 1;
+
+	/* put npc in corner of map */
+	(*npc)->y = 2;
+	(*npc)->x = 2;
 
 	/* ncurses init */
 	initscr();
@@ -59,23 +69,41 @@ int main()
 	main_win = init_main_win();
 	fill_map(main_map, main_win);
 
-	mvwprintw(main_win, (*player)->y, (*player)->x, "%c",
-			(*player)->data->alet);
+	/* add chacters to screen */
+	entry = agent_list->head;
+	do {
+		mvwprintw(main_win, entry->agent->y, entry->agent->x,
+				"%c", entry->agent->data->alet);
+		entry = entry->next;
+	} while (entry);
 	wrefresh(main_win);
 
 	while ((key = getch()) != KEY_F(1)) {
-		/* replace pc char with tile under */
-		mvwprintw(main_win, (*player)->y, (*player)->x,
-				"%c",
-				main_map->tiles[(*player)->y][(*player)->x]->mlet);
+		/* replace agent char with tile under */
+		entry = agent_list->head;
+		do {
+			mvwprintw(main_win, entry->agent->y,
+					entry->agent->x, "%c",
+					main_map->tiles[entry->agent->y][entry->agent->x]->mlet);
+			entry = entry->next;
+		} while (entry);
+
 		action = read_keys(key, (*player), main_map);
 		if (action) {
+			enqueue_action(action, action_queue);
+			action = move_random((*npc), main_map);
 			enqueue_action(action, action_queue);
 			resolve_actions(action_queue);
 			update_agents(agent_list, action_queue);
 			clear_action_queue(action_queue);
-			mvwprintw(main_win, (*player)->y, (*player)->x,
-					"%c", (*player)->data->alet);
+
+			entry = agent_list->head;
+			do {
+				mvwprintw(main_win, entry->agent->y,
+						entry->agent->x, "%c",
+						entry->agent->data->alet);
+				entry = entry->next;
+			} while (entry);
 			wrefresh(main_win);
 		}
 	}
@@ -153,4 +181,16 @@ void fill_map(struct MAP * map, WINDOW * win)
 			mvwprintw(win, i, j, "%c", map->tiles[i][j]->mlet);
 		}
 	}
+}
+
+struct ACTION_QUEUE_ENTRY *move_random(struct AGENT *agent, struct MAP *map)
+{
+	struct ACTION_QUEUE_ENTRY *new_entry = NULL;
+
+	int movex = (rand() % 3) - 1;
+	int movey = (rand() % 3) - 1;
+
+	new_entry = agent_move(agent, map, movey, movex);
+
+	return new_entry;
 }
