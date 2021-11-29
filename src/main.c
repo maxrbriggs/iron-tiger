@@ -69,7 +69,7 @@ int main()
 	main_win = init_main_win();
 	fill_map(main_map, main_win);
 
-	/* add chacters to screen */
+	/* initialize chacters to screen */
 	entry = agent_list->head;
 	do {
 		mvwprintw(main_win, entry->agent->y, entry->agent->x,
@@ -78,6 +78,7 @@ int main()
 	} while (entry);
 	wrefresh(main_win);
 
+	/** MAIN LOOP **/
 	while ((key = getch()) != KEY_F(1)) {
 		/* replace agent char with tile under */
 		entry = agent_list->head;
@@ -97,6 +98,7 @@ int main()
 			update_agents(agent_list, action_queue);
 			clear_action_queue(action_queue);
 
+			/* write agent chars to their map spots */
 			entry = agent_list->head;
 			do {
 				mvwprintw(main_win, entry->agent->y,
@@ -104,11 +106,14 @@ int main()
 						entry->agent->data->alet);
 				entry = entry->next;
 			} while (entry);
-			wrefresh(main_win);
+
+			wrefresh(main_win); /* update window */
 		}
 	}
 	endwin();
 
+	/* Free all memory allocated for map tiles. Probably not
+	   necessary when we're ending the program */
 	for (int i = 0; i < main_map->sizey; i++){
 		for (int j = 0; j < main_map->sizex; j++) {
 			free(main_map->tiles[i][j]);
@@ -175,6 +180,7 @@ WINDOW *init_main_win()
 }
 
 void fill_map(struct MAP * map, WINDOW * win)
+/* prints passed map into window */
 {
 	for (int i = 0; i < map->sizey; i++) {
 		for (int j = 0; j < map->sizex; j++) {
@@ -184,6 +190,8 @@ void fill_map(struct MAP * map, WINDOW * win)
 }
 
 struct ACTION_QUEUE_ENTRY *move_random(struct AGENT *agent, struct MAP *map)
+/* generates action queue entry to move agent to a random
+   adjacent space */
 {
 	struct ACTION_QUEUE_ENTRY *new_entry = NULL;
 
