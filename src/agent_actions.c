@@ -24,8 +24,8 @@ struct ACTION_QUEUE_ENTRY *agent_move(struct AGENT *tomove, struct MAP *map,
 
 	int blocked = 0;
 
-	struct ACTION_QUEUE_ENTRY *new_entry;
-	new_entry = malloc(sizeof(struct ACTION_QUEUE_ENTRY));
+	struct ACTION_QUEUE_ENTRY *new_entry =
+		malloc(sizeof(struct ACTION_QUEUE_ENTRY));
 
 	new_entry->next = NULL;
 
@@ -144,4 +144,42 @@ int update_agents(struct AGENT_LIST *agent_list,
 	}
 
 	return 1;
+}
+
+/* Randomly move an agent around */
+struct ACTION_QUEUE_ENTRY *futz_around(struct AGENT *agent, struct MAP *map)
+{
+	int rn;
+	struct ACTION_QUEUE_ENTRY *new_entry;
+
+	rn = rand() % 8;
+
+	switch(rn) {
+	case 0:
+		new_entry = agent_move(agent, map, -1, 0);
+		break;
+	case 1:
+		new_entry = agent_move(agent, map, -1, 1);
+		break;
+	case 2:
+		new_entry = agent_move(agent, map, 0, 1);
+		break;
+	case 3:
+		new_entry = agent_move(agent, map, 1, 1);
+		break;
+	case 4:
+		new_entry = agent_move(agent, map, 1, 0);
+		break;
+	case 5:
+		new_entry = agent_move(agent, map, 1, -1);
+		break;
+	case 6:
+		new_entry = agent_move(agent, map, 0, -1);
+		break;
+	case 7:
+		new_entry = agent_move(agent, map, -1, -1);
+		break;
+	}
+
+	return new_entry;
 }
