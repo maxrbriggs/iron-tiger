@@ -24,9 +24,9 @@ int main()
 
 	struct MAP *main_map = init_map_blank(16, 16);
 	struct ACTION_QUEUE *action_queue;
-	struct ACTION_QUEUE_ENTRY *action;
+	struct ACTION_QUEUE_ENTRY *action_queue_entry;
 
-	struct AGENT_LIST_ENTRY *entry;
+	struct AGENT_LIST_ENTRY *agent_list_entry;
 	struct AGENT_LIST *agent_list;
 	extern const struct PERAGENT PERAGENTLIST[]; /* probably not a good idea */
 
@@ -71,40 +71,41 @@ int main()
 	fill_map(main_map, main_win);
 
 	/* initialize chacters to screen */
-	entry = agent_list->head;
+	agent_list_entry = agent_list->head;
 	do {
-		mvwprintw(main_win, entry->agent->y, entry->agent->x,
-				"%c", entry->agent->data->alet);
-		entry = entry->next;
-	} while (entry);
+		mvwprintw(main_win, agent_list_entry->agent->y,
+				agent_list_entry->agent->x, "%c",
+				agent_list_entry->agent->data->alet);
+		agent_list_entry = agent_list_entry->next;
+	} while (agent_list_entry);
 	wrefresh(main_win);
 
 	/** MAIN LOOP **/
 	while ((key = getch()) != KEY_F(1)) {
 		/* replace agent char with tile under */
-		entry = agent_list->head;
+		agent_list_entry = agent_list->head;
 		do {
-			mvwprintw(main_win, entry->agent->y,
-					entry->agent->x, "%c",
-					main_map->tiles[entry->agent->y][entry->agent->x]->mlet);
-			entry = entry->next;
-		} while (entry);
+			mvwprintw(main_win, agent_list_entry->agent->y,
+					agent_list_entry->agent->x, "%c",
+					main_map->tiles[agent_list_entry->agent->y][agent_list_entry->agent->x]->mlet);
+			agent_list_entry = agent_list_entry->next;
+		} while (agent_list_entry);
 
-		action = read_keys(key, (*player), main_map);
-		if (action) {
-			enqueue_action(action, action_queue);
-			action = move_random((*npc), main_map);
-			enqueue_action(action, action_queue);
+		action_queue_entry = read_keys(key, (*player), main_map);
+		if (action_queue_entry) {
+			enqueue_action(action_queue_entry, action_queue);
+			action_queue_entry = move_random((*npc), main_map);
+			enqueue_action(action_queue_entry, action_queue);
 			resolve_actions(action_queue);
 
 			/* write agent chars to their map spots */
-			entry = agent_list->head;
+			agent_list_entry = agent_list->head;
 			do {
-				mvwprintw(main_win, entry->agent->y,
-						entry->agent->x, "%c",
-						entry->agent->data->alet);
-				entry = entry->next;
-			} while (entry);
+				mvwprintw(main_win, agent_list_entry->agent->y,
+						agent_list_entry->agent->x, "%c",
+						agent_list_entry->agent->data->alet);
+				agent_list_entry = agent_list_entry->next;
+			} while (agent_list_entry);
 
 			wrefresh(main_win); /* update window */
 		}
@@ -139,6 +140,8 @@ struct ACTION_QUEUE_ENTRY *read_keys(int keys, struct AGENT *pc, struct MAP *map
 	new_entry->action_data.ptr_data[0] = pc;
 	new_entry->action_data.ptr_data[1] = map;
 	new_entry->next = NULL;
+
+	new_entry->action_fuction = NULL;
 
 	switch(keys) {
 	/* momement */

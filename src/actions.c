@@ -25,13 +25,20 @@ int resolve_actions(struct ACTION_QUEUE *action_queue)
 {
 	struct ACTION_QUEUE_ENTRY *action = action_queue->head;
 	struct ACTION_QUEUE_ENTRY *action_prev = NULL;
+
+	if (!action_queue->head) 
+		return 0;
 	
 	action_queue->head = NULL;
 	while (action) {
-		action->action_fuction(&(action->action_data));
+		if(action->action_fuction)
+			action->action_fuction(&(action->action_data));
+
 		action_prev = action;
 		action = action->next;
 
+		action_prev->action_data.ptr_data = NULL;
+		action_prev->action_data.int_data = NULL;
 		free(action_prev->action_data.ptr_data);
 		free(action_prev->action_data.int_data);
 		free(action_prev);

@@ -42,14 +42,16 @@ int agent_move(struct ACTION_QUEUE_ENTRY_DATA * action_data)
 	   || agent->x + dx > map->sizex) {
 		blocked = 1;
 	/* if blocked tile */
-	} else if (map->tiles[agent->y + dy][agent->x]->blocked
-	          || map->tiles[agent->y][agent->x + dx]->blocked) {
+	} else if (map->tiles[agent->y + dy][agent->x + dx]->blocked) {
 		blocked = 1;
 	}
 
 	if (!blocked) {
+		/* unblock old tile */
+		map->tiles[agent->y][agent->x]->blocked = 0;
 		agent->y += dy;
 		agent->x += dx;
+		map->tiles[agent->y][agent->x]->blocked = 1;
 	}
 
 	return 1;
