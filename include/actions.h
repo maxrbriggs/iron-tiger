@@ -3,9 +3,17 @@
    Report if action succeeds or fails.
 */
 
+/* yes this is cursed */
+struct ACTION_QUEUE_ENTRY_DATA {
+	int ptr_data_length;
+	void **ptr_data;
+	int int_data_length;
+	int *int_data;
+};
+
 struct ACTION_QUEUE_ENTRY {
-	int updated;
-	struct AGENT *new_state;
+	int (*action_fuction)(struct ACTION_QUEUE_ENTRY_DATA *);
+	struct ACTION_QUEUE_ENTRY_DATA action_data;
 	struct ACTION_QUEUE_ENTRY *next;
 };
 

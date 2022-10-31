@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdarg.h>
 #include <ncurses.h>
 #include "map.h"
 #include "peragent.h"
@@ -95,8 +96,6 @@ int main()
 			action = move_random((*npc), main_map);
 			enqueue_action(action, action_queue);
 			resolve_actions(action_queue);
-			update_agents(agent_list, action_queue);
-			clear_action_queue(action_queue);
 
 			/* write agent chars to their map spots */
 			entry = agent_list->head;
@@ -129,37 +128,63 @@ int main()
 
 struct ACTION_QUEUE_ENTRY *read_keys(int keys, struct AGENT *pc, struct MAP *map)
 {
-	struct ACTION_QUEUE_ENTRY *new_entry = NULL;
+	struct ACTION_QUEUE_ENTRY *new_entry =
+		malloc(sizeof(struct ACTION_QUEUE_ENTRY));
+
+	new_entry->action_data.ptr_data = malloc(sizeof(void *) * 2);
+	new_entry->action_data.int_data = malloc(sizeof(int) * 2);
+	new_entry->action_data.ptr_data_length = 2;
+	new_entry->action_data.int_data_length = 2;
+
+	new_entry->action_data.ptr_data[0] = pc;
+	new_entry->action_data.ptr_data[1] = map;
+	new_entry->next = NULL;
 
 	switch(keys) {
 	/* momement */
 	case KEY_LEFT:
 	case 'h':
-		new_entry = agent_move(pc, map, 0, -1);
+		new_entry->action_fuction = agent_move;
+		new_entry->action_data.int_data[0] = 0;
+		new_entry->action_data.int_data[1] = -1;
 		break;
 	case KEY_RIGHT:
 	case 'l':
-		new_entry = agent_move(pc, map, 0, 1);
+		new_entry->action_fuction = agent_move;
+		new_entry->action_data.int_data[0] = 0;
+		new_entry->action_data.int_data[1] = 1;
 		break;
 	case KEY_UP:
 	case 'k':
-		new_entry = agent_move(pc, map, -1, 0);
+		new_entry->action_fuction = agent_move;
+		new_entry->action_data.int_data[0] = -1;
+		new_entry->action_data.int_data[1] = 0;
 		break;
 	case KEY_DOWN:
 	case 'j':
-		new_entry = agent_move(pc, map, 1, 0);
+		new_entry->action_fuction = agent_move;
+		new_entry->action_data.int_data[0] = 1;
+		new_entry->action_data.int_data[1] = 0;
 		break;
 	case 'y':
-		new_entry = agent_move(pc, map, -1, -1);
+		new_entry->action_fuction = agent_move;
+		new_entry->action_data.int_data[0] = -1;
+		new_entry->action_data.int_data[1] = -1;
 		break;
 	case 'u':
-		new_entry = agent_move(pc, map, -1, 1);
+		new_entry->action_fuction = agent_move;
+		new_entry->action_data.int_data[0] = -1;
+		new_entry->action_data.int_data[1] = 1;
 		break;
 	case 'n':
-		new_entry = agent_move(pc, map, 1, 1);
+		new_entry->action_fuction = agent_move;
+		new_entry->action_data.int_data[0] = 1;
+		new_entry->action_data.int_data[1] = 1;
 		break;
 	case 'b':
-		new_entry = agent_move(pc, map, 1, -1);
+		new_entry->action_fuction = agent_move;
+		new_entry->action_data.int_data[0] = 1;
+		new_entry->action_data.int_data[1] = -1;
 		break;
 	}
 
@@ -190,15 +215,29 @@ void fill_map(struct MAP * map, WINDOW * win)
 }
 
 struct ACTION_QUEUE_ENTRY *move_random(struct AGENT *agent, struct MAP *map)
+
 /* generates action queue entry to move agent to a random
    adjacent space */
 {
-	struct ACTION_QUEUE_ENTRY *new_entry = NULL;
+	struct ACTION_QUEUE_ENTRY *new_entry =
+		malloc(sizeof(struct ACTION_QUEUE_ENTRY));
 
-	int movex = (rand() % 3) - 1;
-	int movey = (rand() % 3) - 1;
+	new_entry->action_data.ptr_data = malloc(sizeof(void *) * 2);
+	new_entry->action_data.int_data = malloc(sizeof(int) * 2);
+	new_entry->action_data.ptr_data_length = 2;
+	new_entry->action_data.int_data_length = 2;
 
-	new_entry = agent_move(agent, map, movey, movex);
+	new_entry->action_data.ptr_data[0] = agent;
+	new_entry->action_data.ptr_data[1] = map;
+	new_entry->next = NULL;
+
+	int dy = (rand() % 3) - 1;
+	int dx = (rand() % 3) - 1;
+
+	new_entry->action_data.int_data[0] = dy;
+	new_entry->action_data.int_data[1] = dx;
+
+	new_entry->action_fuction=agent_move;
 
 	return new_entry;
 }

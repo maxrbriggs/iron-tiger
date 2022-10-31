@@ -10,8 +10,6 @@ int enqueue_action(struct ACTION_QUEUE_ENTRY *entry,
 		return 0;
 	}
 
-	entry->updated = 0;
-
 	if (!action_queue->head) {
 		action_queue->head = entry;
 		action_queue->tail = entry;
@@ -26,11 +24,17 @@ int enqueue_action(struct ACTION_QUEUE_ENTRY *entry,
 int resolve_actions(struct ACTION_QUEUE *action_queue)
 {
 	struct ACTION_QUEUE_ENTRY *action = action_queue->head;
-
+	struct ACTION_QUEUE_ENTRY *action_prev = NULL;
+	
+	action_queue->head = NULL;
 	while (action) {
-		/* conflict checking will go here */
-		action->updated = 1;
+		action->action_fuction(&(action->action_data));
+		action_prev = action;
 		action = action->next;
+
+		free(action_prev->action_data.ptr_data);
+		free(action_prev->action_data.int_data);
+		free(action_prev);
 	}
 
 	return 1;
