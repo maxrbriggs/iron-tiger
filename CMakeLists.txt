@@ -7,7 +7,7 @@ set(SOURCES
 	src/map.c
 )
 include_directories(${PROJECT_SOURCE_DIR}/include)
-set(CMAKE_C_FLAGS "-Wall -lncurses")
+set(CMAKE_C_FLAGS "-ggdb -Wall -lncurses")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_executable(iron-tiger ${SOURCES})
