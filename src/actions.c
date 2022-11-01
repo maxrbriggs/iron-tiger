@@ -37,8 +37,6 @@ int resolve_actions(struct ACTION_QUEUE *action_queue)
 		action_prev = action;
 		action = action->next;
 
-		action_prev->action_data.ptr_data = NULL;
-		action_prev->action_data.int_data = NULL;
 		free(action_prev->action_data.ptr_data);
 		free(action_prev->action_data.int_data);
 		free(action_prev);
